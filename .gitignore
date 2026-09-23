@@ -1,0 +1,12 @@
+# The Python environment from step 3 of the README. It is rebuilt from
+# pyproject.toml, so it never belongs in the repository.
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Notebook run state. Outputs stay in the file -- a lab you have run is your
+# own work -- but the checkpoint copies are noise.
+.ipynb_checkpoints/
+
+.DS_Store
