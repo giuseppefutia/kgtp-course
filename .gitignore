@@ -10,3 +10,10 @@ __pycache__/
 .ipynb_checkpoints/
 
 .DS_Store
+
+# Module 3's payload, and everything its loaders generate from it. That
+# module's README says why it is never committed: larger than git should
+# carry, and rebuilt rather than edited.
+modules/03-where-data-lives/import
+/module-03-payload.zip
+/SHA256SUMS.txt

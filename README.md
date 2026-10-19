@@ -19,7 +19,7 @@ every one.
 |---|---|---|
 | 1 | **The Connected World** — Why Graphs Change Everything | [`01-the-connected-world`](modules/01-the-connected-world) |
 | 2 | **Modeling the World** — Schemas, Ontologies & Validation | [`02-modeling-the-world`](modules/02-modeling-the-world) |
-| 3 | **Where Data Lives** — Databases, Queries & Graph Algorithms | |
+| 3 | **Where Data Lives** — Databases, Queries & Graph Algorithms | [`03-where-data-lives`](modules/03-where-data-lives) |
 | 4 | **Building the Graph** — Ingestion, Extraction & Ontology Design | |
 | 5 | **GraphRAG** — Agents That Navigate Your Knowledge | |
 | 6 | **Agentic Memory** — Building Systems That Learn Over Time | |

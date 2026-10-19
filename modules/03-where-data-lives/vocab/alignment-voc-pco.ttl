@@ -1,0 +1,65 @@
+## The bridge from module 3's direct mapping to module 2's vocabulary.
+##
+## Module 3 exports the property graph mechanically: every label becomes a
+## `voc:` class, every property and every edge type a `voc:` predicate. That
+## mapping is honest and it is also parochial -- it speaks only our names.
+##
+## These axioms say, once, how our names relate to the Public Contracts
+## Ontology. Nothing in the data changes. What changes is that a reasoner can
+## derive the PCO form, and then **the five SHACL shapes written by hand in
+## module 2 run on module 3's data without being touched.**
+##
+## That is the argument for RDF stated as something testable rather than as a
+## slogan: constraints written against someone else's vocabulary apply to your
+## data, because a mapping layer made the two meet.
+##
+## Written against what module 2 actually targets, read out of its notebook on
+## 5/10/2026: pc:Contract and kgtp:ContractRecord as classes, and the properties
+## pc:startDate, pc:actualEndDate, pc:awardDate, pc:contractingAuthority, plus
+## kgtp:revisionOf and kgtp:revisionNumber inside its SPARQL constraint.
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix voc:  <http://kgtp.org/voc/> .
+@prefix kgtp: <http://kgtp.org/> .
+@prefix pc:   <http://purl.org/procurement/public-contracts#> .
+@prefix gr:   <http://purl.org/goodrelations/v1#> .
+
+# --- classes ----------------------------------------------------------------
+# Both of ours are contracts in PCO's sense. The second line is the one that
+# earns its keep: module 2 had to name kgtp:ContractRecord explicitly in every
+# shape, because rdflib materialises nothing and SHACL only follows what the
+# data says. Here the subclass axiom becomes data, and a shape targeting
+# pc:Contract alone reaches the 185,730 revisions by itself.
+voc:Contract        rdfs:subClassOf pc:Contract .
+voc:ContractRecord  rdfs:subClassOf pc:Contract , kgtp:ContractRecord .
+
+voc:Organization    rdfs:subClassOf gr:BusinessEntity .
+voc:Department      rdfs:subClassOf gr:BusinessEntity .
+
+# --- dates ------------------------------------------------------------------
+# Decision 7 keeps a typed date beside the source text; only the typed one is
+# bridged, because a shape comparing against xsd:date cannot read "07/30/2001".
+voc:startDate     rdfs:subPropertyOf pc:startDate .
+voc:endDate       rdfs:subPropertyOf pc:actualEndDate .
+voc:approvalDate  rdfs:subPropertyOf pc:awardDate .
+
+# --- parties ----------------------------------------------------------------
+# RECORDED_DEPARTMENT and not ASSIGNS_CONTRACT: both say the same thing, but
+# PCO's contractingAuthority runs contract -> authority, which is the direction
+# the record-level edge already has. Bridging the entity-level edge instead
+# would need owl:inverseOf and therefore an OWL ruleset rather than RDFS.
+voc:RECORDED_DEPARTMENT rdfs:subPropertyOf pc:contractingAuthority .
+voc:HAS_VENDOR          rdfs:subPropertyOf pc:bidder .
+voc:RECORDED_VENDOR     rdfs:subPropertyOf pc:bidder .
+
+# --- revisions --------------------------------------------------------------
+# What module 2's sh:sparql constraint reads. `revisionNumber` has no
+# counterpart in our export: the mechanical mapping carried the record's `id`,
+# and the revision number is that id's position within its contract, which is
+# not a property any row holds. Declared here so the gap is visible rather than
+# silently making the constraint vacuous -- see the note in SHACL.md.
+voc:INCLUDED_IN_CONTRACT rdfs:subPropertyOf kgtp:revisionOf .
+
+# --- names ------------------------------------------------------------------
+voc:name rdfs:subPropertyOf gr:legalName .

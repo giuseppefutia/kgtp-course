@@ -1,0 +1,71 @@
+<style>
+#__UID__{font-family:Arial,Helvetica,sans-serif;color:#263238;background:#FFFFFF;border:1px solid #CFD8DC;border-radius:10px;padding:16px 18px;max-width:740px;box-sizing:border-box;line-height:1.4}
+#__UID__ *{box-sizing:border-box}
+#__UID__ .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px}
+#__UID__ .bar span{font-size:13px;color:#607D8B;margin-right:2px}
+#__UID__ .gap{width:14px}
+#__UID__ button{font:inherit;font-size:13px;padding:5px 12px;border:1px solid #B7B7B7;background:#FFFFFF;color:#263238;border-radius:6px;cursor:pointer}
+#__UID__ button:hover{background:#ECEFF1}
+#__UID__ button.sel{border-color:#0091EA;color:#0053A3;background:#ECEFF1;font-weight:bold}
+#__UID__ button:focus-visible{outline:2px solid #0091EA;outline-offset:2px}
+#__UID__ .out{font-size:14px;line-height:1.55;min-height:3.4em;background:#ECEFF1;color:#263238;border-radius:6px;padding:9px 12px;margin:0 0 14px}
+#__UID__ .cap{font-size:12px;font-weight:bold;color:#607D8B;margin:0 0 5px}
+#__UID__ .c{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:30px;padding:0 6px;border:1px solid #CFD8DC;border-radius:5px;font-size:13px;background:#FFFFFF;color:#263238}
+#__UID__ .c.e{color:#B7B7B7;border-color:#ECEFF1;background:transparent}
+#__UID__ .c.on{background:#ACDBF8;color:#0053A3;border-color:#0091EA}
+#__UID__ .c.hot{background:#0091EA;color:#FFFFFF;border-color:#0091EA;font-weight:bold}
+#__UID__ .c.b{box-shadow:0 0 0 2px #0091EA inset;color:#0053A3}
+#__UID__ .h{display:inline-flex;justify-content:center;min-width:40px;font-size:11px;color:#9E9E9E}
+#__UID__ .rl{display:inline-block;width:62px;font-size:12px;color:#607D8B}
+#__UID__ .r{display:flex;gap:4px;align-items:center;margin:0 0 4px}
+@media (prefers-reduced-motion:no-preference){#__UID__ .c{transition:background .15s,border-color .15s}}
+#__UID__ .c.sk{box-shadow:0 0 0 2px #FF9900 inset;color:#263238}
+</style>
+<div id="__UID__">
+<div class="bar"><span>Compute</span>
+<button data-m="cell">one cell</button><button data-m="row">one row</button></div>
+<p class="out" aria-live="polite"></p>
+<div style="display:flex;flex-wrap:wrap;gap:30px;align-items:flex-start">
+<div><p class="cap">A = HAS_VENDOR</p><div class="mA"></div></div>
+<div><p class="cap">B = ORG_HAS_LICENSE</p><div class="mB"></div></div>
+<div><p class="cap">A × B · click a cell or a row label</p><div class="mP"></div></div>
+</div>
+</div>
+<script>
+(function(){
+const R=document.getElementById('__UID__'), $=s=>R.querySelector(s), $$=s=>R.querySelectorAll(s);
+const C=['c1','c2','c3'],O=['o1','o2','o3','o4'],L=['l1','l2','l3'];
+const A=[[1,0,0,0],[0,0,1,0],[0,1,0,1]];
+const B=[[1,0,1],[0,1,0],[0,0,0],[0,0,1]];
+const P=C.map((_,i)=>L.map((_,j)=>O.reduce((s,_,o)=>s+A[i][o]*B[o][j],0)));
+function grid(k,rows,cols,m,click){let h='<div class="r"><span class="rl" style="width:28px"></span>'+cols.map(c=>'<span class="h">'+c+'</span>').join('')+'</div>';
+ rows.forEach((r,i)=>{h+='<div class="r"><span class="rl" style="width:28px'+(click?';cursor:pointer;text-decoration:underline dotted':'')+'" '+(click?'data-row="'+i+'"':'')+'>'+r+'</span>'+cols.map((_,j)=>'<span class="c'+(m[i][j]?'':' e')+'" data-'+k+'="'+i+'-'+j+'"'+(click?' style="cursor:pointer"':'')+'>'+m[i][j]+'</span>').join('')+'</div>';});
+ return h;}
+$('.mA').innerHTML=grid('a',C,O,A);$('.mB').innerHTML=grid('b',O,L,B);$('.mP').innerHTML=grid('p',C,L,P,true);
+let M='cell',I=2,J=2;
+const cl=(k,i,j,c)=>$('[data-'+k+'="'+i+'-'+j+'"]').classList.add(c);
+function paint(){
+ $$('.c').forEach(c=>c.classList.remove('on','hot','b'));
+ $$('button[data-m]').forEach(b=>b.classList.toggle('sel',b.dataset.m===M));
+ const out=$('.out');
+ if(M==='cell'){
+  O.forEach((_,o)=>{cl('a',I,o,'on');cl('b',o,J,'on');if(A[I][o]&&B[o][J]){cl('a',I,o,'hot');cl('b',o,J,'hot');}});
+  cl('p',I,J,'b');
+  const terms=O.map((_,o)=>A[I][o]+'·'+B[o][J]).join(' + ');
+  const paths=O.filter((_,o)=>A[I][o]&&B[o][J]).map(o=>C[I]+' → '+o+' → '+L[J]);
+  const via=O.map((n,o)=>(A[I][o]&&B[o][J])?n:null).filter(Boolean);
+  out.textContent='Cell ('+C[I]+', '+L[J]+'): row '+C[I]+' of A against column '+L[J]+' of B, position by position. '+terms+' = '+P[I][J]+'. A term is 1 only where both edges exist'+(via.length?': via '+via.join(', ')+', so '+P[I][J]+' path'+(P[I][J]>1?'s':'')+' of two hops.':', and none does here: no path of two hops.');
+ } else {
+  const rows=[I];
+  rows.forEach(i=>{A[i].forEach((v,o)=>{if(v){cl('a',i,o,'hot');B[o].forEach((w,j)=>cl('b',o,j,'on'));}});L.forEach((_,j)=>cl('p',i,j,P[i][j]?'hot':'b'));});
+  const os=O.map((n,o)=>A[I][o]?o:-1).filter(o=>o>=0);
+  const vec=r=>'['+r.join(' ')+']';
+  out.textContent='Row '+C[I]+' of A × B is the sum of the rows of B picked by the 1s in row '+C[I]+' of A ('+(os.map(o=>O[o]).join(', ')||'none')+'): '+(os.length?os.map(o=>vec(B[o])).join(' + ')+' = ':'')+vec(P[I])+'. This is exactly the two-hop walk above. The engine computes ONE such row to answer a question -- never the whole table.';
+ }}
+R.addEventListener('click',e=>{const b=e.target.closest('button');
+ if(b&&b.dataset.m){M=b.dataset.m;paint();return;}
+ const c=e.target.closest('[data-p]');if(c){const [i,j]=c.dataset.p.split('-').map(Number);I=i;J=j;M='cell';paint();return;}
+ const r=e.target.closest('[data-row]');if(r){I=+r.dataset.row;M='row';paint();}});
+paint();
+})();
+</script>

@@ -1,0 +1,79 @@
+## Module 3 — the Fuseki dataset, declared here instead of inherited.
+##
+## Two departures from the assembler that ships in the secoresearch image, and
+## both are needed for the comparison rather than for taste.
+##
+## 1. TDB2, not TDB1. The image declares `tdb:DatasetTDB`, which is TDB1, while
+##    the bulk loader this module uses is tdb2.xloader. Loading with one and
+##    serving with the other fails at startup with "the lock file contents
+##    appear to be for a TDB2 database" and the server never comes up
+##    (seen 4/10/2026). TDB2 is also the maintained store and the one Jena
+##    recommends at this size.
+##
+## 2. The text index points at OUR predicates. The default maps skos:prefLabel,
+##    skos:altLabel, skos:hiddenLabel and rdfs:label -- none of which occur
+##    anywhere in this dataset, so the index would be empty and every name
+##    search would be a scan. Neo4j carries FULLTEXT indexes on
+##    Organization.name and Contract.name; voc:name is the same field for both,
+##    and without it the name-search question compares an index against a full
+##    scan and reports it as an engine difference.
+
+@prefix fuseki: <http://jena.apache.org/fuseki#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ja:     <http://jena.hpl.hp.com/2005/11/Assembler#> .
+@prefix tdb2:   <http://jena.apache.org/2016/tdb#> .
+@prefix text:   <http://jena.apache.org/text#> .
+@prefix voc:    <http://kgtp.org/voc/> .
+@prefix :       <#> .
+
+<#service> rdf:type fuseki:Service ;
+    fuseki:name                       "ds" ;
+    fuseki:serviceQuery               "sparql" ;
+    fuseki:serviceUpdate              "update" ;
+    fuseki:serviceReadWriteGraphStore "data" ;
+    fuseki:endpoint [ fuseki:operation fuseki:shacl ; fuseki:name "shacl" ] ;
+    fuseki:dataset                    <#text> ;
+    .
+
+<#text> rdf:type text:TextDataset ;
+    text:dataset <#tdb> ;
+    text:index   <#lucene> ;
+    .
+
+<#tdb> rdf:type tdb2:DatasetTDB2 ;
+    tdb2:location "/fuseki-base/databases/tdb" ;
+    # The payload is loaded into one named graph so a single SPARQL text runs on
+    # all three stores. With the union in place, `?s ?p ?o` sees it without a
+    # GRAPH clause -- but note that the *stored* default graph is not part of
+    # this union, which is why nothing is ever loaded there.
+    tdb2:unionDefaultGraph true ;
+    .
+
+<#lucene> a text:TextIndexLucene ;
+    text:directory <file:/fuseki-base/databases/lucene> ;
+    text:storeValues true ;
+    text:entityMap <#entity-map> ;
+    .
+
+<#entity-map> a text:EntityMap ;
+    text:entityField  "uri" ;
+    text:graphField   "graph" ;
+    text:defaultField "text" ;
+    text:uidField     "uid" ;
+    text:langField    "lang" ;
+    ## Only voc:name, because that is what the other engines index: the source
+    ## graph carries full-text on Organization.name and Contract.name and
+    ## nothing else the narrowed payload ships (checked 7/10/2026).
+    ##
+    ## It is still not the same index, and the difference is the paradigm rather
+    ## than a misconfiguration. Neo4j and FalkorDB scope an index to a LABEL;
+    ## Lucene here is told a PREDICATE, and voc:name occurs on Organization,
+    ## Contract, OrganizationGroup, DepartmentGroup, LicenseRecord and
+    ## ContractRecord alike. So the RDF index is necessarily wider than the two
+    ## it is being compared with, and a name search that hits it is searching
+    ## more rows for the same answer.
+    text:map (
+         [ text:field "text" ; text:predicate voc:name ]
+         )
+    .

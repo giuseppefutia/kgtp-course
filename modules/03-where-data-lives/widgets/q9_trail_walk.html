@@ -1,0 +1,68 @@
+<style>
+#__UID__{font-family:Arial,Helvetica,sans-serif;color:#263238;background:#FFFFFF;border:1px solid #CFD8DC;border-radius:10px;padding:16px 18px;max-width:740px;box-sizing:border-box;line-height:1.4}
+#__UID__ *{box-sizing:border-box}
+#__UID__ .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px}
+#__UID__ .bar span{font-size:13px;color:#607D8B;margin-right:2px}
+#__UID__ .gap{width:14px}
+#__UID__ button{font:inherit;font-size:13px;padding:5px 12px;border:1px solid #B7B7B7;background:#FFFFFF;color:#263238;border-radius:6px;cursor:pointer}
+#__UID__ button:hover{background:#ECEFF1}
+#__UID__ button.sel{border-color:#0091EA;color:#0053A3;background:#ECEFF1;font-weight:bold}
+#__UID__ button:focus-visible{outline:2px solid #0091EA;outline-offset:2px}
+#__UID__ .out{font-size:14px;line-height:1.55;min-height:3.4em;background:#ECEFF1;color:#263238;border-radius:6px;padding:9px 12px;margin:0 0 14px}
+#__UID__ .cap{font-size:12px;font-weight:bold;color:#607D8B;margin:0 0 5px}
+#__UID__ .c{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:30px;padding:0 6px;border:1px solid #CFD8DC;border-radius:5px;font-size:13px;background:#FFFFFF;color:#263238}
+#__UID__ .c.e{color:#B7B7B7;border-color:#ECEFF1;background:transparent}
+#__UID__ .c.on{background:#ACDBF8;color:#0053A3;border-color:#0091EA}
+#__UID__ .c.hot{background:#0091EA;color:#FFFFFF;border-color:#0091EA;font-weight:bold}
+#__UID__ .c.b{box-shadow:0 0 0 2px #0091EA inset;color:#0053A3}
+#__UID__ .h{display:inline-flex;justify-content:center;min-width:40px;font-size:11px;color:#9E9E9E}
+#__UID__ .rl{display:inline-block;width:62px;font-size:12px;color:#607D8B}
+#__UID__ .r{display:flex;gap:4px;align-items:center;margin:0 0 4px}
+@media (prefers-reduced-motion:no-preference){#__UID__ .c{transition:background .15s,border-color .15s}}
+#__UID__ .c.sk{box-shadow:0 0 0 2px #FF9900 inset;color:#263238}
+</style>
+<div id="__UID__">
+<div class="bar"><span>Count as</span><button data-s="trail">trail · Neo4j, FalkorDB</button><button data-s="walk">walk · Kuzu</button>
+<span class="gap"></span><span>Path</span><button data-p="0">a → b → a → b</button><button data-p="1">b → a → b → a</button><button data-p="2">b → a → b → c</button></div>
+<p class="out" aria-live="polite"></p>
+<svg viewBox="0 30 680 160" width="100%" style="max-width:600px;display:block;margin:0 auto 6px" font-family="Arial, Helvetica, sans-serif" role="img" aria-label="Three nodes: a and b joined by edges in both directions, and an edge from b to c">
+<defs><marker id="__UID__g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#B7B7B7"/></marker>
+<marker id="__UID__b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0091EA"/></marker>
+<marker id="__UID__o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#FF9900"/></marker></defs>
+<path data-e="ab" d="M164 98 Q240 52 316 98" fill="none" stroke="#B7B7B7" stroke-width="2" marker-end="url(#__UID__g)"/>
+<path data-e="ba" d="M316 122 Q240 168 164 122" fill="none" stroke="#B7B7B7" stroke-width="2" marker-end="url(#__UID__g)"/>
+<line data-e="bc" x1="364" y1="110" x2="516" y2="110" stroke="#B7B7B7" stroke-width="2" marker-end="url(#__UID__g)"/>
+<g data-l="ab"><rect x="214" y="56" width="52" height="20" rx="4" fill="#FFFFFF" stroke="#B7B7B7"/><text x="240" y="70" font-size="11" font-weight="bold" fill="#607D8B" text-anchor="middle">a→b</text></g>
+<g data-l="ba"><rect x="214" y="144" width="52" height="20" rx="4" fill="#FFFFFF" stroke="#B7B7B7"/><text x="240" y="158" font-size="11" font-weight="bold" fill="#607D8B" text-anchor="middle">b→a</text></g>
+<g data-l="bc"><rect x="414" y="86" width="52" height="20" rx="4" fill="#FFFFFF" stroke="#B7B7B7"/><text x="440" y="100" font-size="11" font-weight="bold" fill="#607D8B" text-anchor="middle">b→c</text></g>
+<g data-v="a"><rect x="118" y="93" width="44" height="34" rx="6" fill="#CFD8DC" stroke="#FFFFFF"/><text x="140" y="115" font-size="14" font-weight="bold" fill="#263238" text-anchor="middle">a</text></g>
+<g data-v="b"><rect x="318" y="93" width="44" height="34" rx="6" fill="#CFD8DC" stroke="#FFFFFF"/><text x="340" y="115" font-size="14" font-weight="bold" fill="#263238" text-anchor="middle">b</text></g>
+<g data-v="c"><rect x="518" y="93" width="44" height="34" rx="6" fill="#CFD8DC" stroke="#FFFFFF"/><text x="540" y="115" font-size="14" font-weight="bold" fill="#263238" text-anchor="middle">c</text></g>
+</svg>
+<p class="cap" style="text-align:center;font-weight:normal;margin:0 0 12px">a and b stand for contracts:93568835Z and contracts:93568827H, one of the 114 reciprocal pairs on IS_SIMILAR_TO.</p>
+<div class="list"></div>
+</div>
+<script>
+(function(){
+const R=document.getElementById('__UID__'), $=s=>R.querySelector(s), $$=s=>R.querySelectorAll(s);
+const PATHS=[{e:['ab','ba','ab'],n:'a → b → a → b'},{e:['ba','ab','ba'],n:'b → a → b → a'},{e:['ba','ab','bc'],n:'b → a → b → c'}];
+const rep=p=>p.e.find((x,i)=>p.e.indexOf(x)!==i);
+let S='trail',P=0;
+function render(){
+ $$('button[data-s]').forEach(b=>b.classList.toggle('sel',b.dataset.s===S));$$('button[data-p]').forEach(b=>b.classList.toggle('sel',+b.dataset.p===P));
+ $$('[data-e]').forEach(l=>{l.setAttribute('stroke','#B7B7B7');l.setAttribute('stroke-width','2');l.setAttribute('marker-end','url(#__UID__g)');});
+ $$('[data-l] rect').forEach(r=>{r.setAttribute('stroke','#B7B7B7');r.setAttribute('stroke-width','1')});
+ $$('[data-l] text').forEach(t=>{t.setAttribute('fill','#607D8B');t.textContent=t.parentNode.dataset.l[0]+'→'+t.parentNode.dataset.l[1];});
+ $$('[data-v] rect').forEach(r=>r.setAttribute('fill','#CFD8DC'));$$('[data-v] text').forEach(t=>t.setAttribute('fill','#263238'));
+ const p=PATHS[P],r=rep(p),bad=(S==='trail'&&r);
+ p.e.forEach((e,i)=>{const col=(bad&&e===r)?'#FF9900':'#0091EA';const l=$('[data-e="'+e+'"]');l.setAttribute('stroke',col);l.setAttribute('stroke-width','3');l.setAttribute('marker-end','url(#__UID__'+(col==='#FF9900'?'o':'b')+')');
+  const g=$('[data-l="'+e+'"]');g.querySelector('rect').setAttribute('stroke','#263238');g.querySelector('rect').setAttribute('stroke-width','1.5');
+  const steps=p.e.map((x,j)=>x===e?j+1:null).filter(Boolean);g.querySelector('text').textContent='step '+steps.join(', ');g.querySelector('text').setAttribute('fill','#263238');});
+ const first=p.n[0];$('[data-v="'+first+'"] rect').setAttribute('fill','#0053A3');$('[data-v="'+first+'"] text').setAttribute('fill','#FFFFFF');
+ const counted=PATHS.filter(x=>S==='walk'||!rep(x));
+ $('.list').innerHTML='<p class="cap">The paths of length 3 in this graph</p>'+PATHS.map((x,i)=>{const ok=S==='walk'||!rep(x);return '<div class="r"><span class="c'+(i===P?' b':'')+'" style="min-width:150px">'+x.n+'</span><span class="c'+(ok?' on':' sk')+'" style="min-width:250px;justify-content:flex-start;font-size:12px">'+(ok?'counted':'not counted: uses '+rep(x)[0]+'→'+rep(x)[1]+' twice')+'</span></div>';}).join('');
+ $('.out').textContent=p.n+(r?' uses the edge '+r[0]+'→'+r[1]+' twice (steps '+p.e.map((x,j)=>x===r?j+1:null).filter(Boolean).join(' and ')+').':' uses three different edges; it repeats the node b, which both definitions allow.')+' '+(S==='trail'?'A trail may not repeat a relationship, so this graph has '+counted.length+' path of length 3.':'A walk may, so this graph has '+counted.length+' paths of length 3.')+' The difference is one walk per directed edge whose reverse exists — 2 here, 228 on the real graph, and exactly the gap in Q9.';}
+R.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.s)S=b.dataset.s;else if(b.dataset.p)P=+b.dataset.p;render();});
+render();
+})();
+</script>

@@ -1,0 +1,197 @@
+# Module 3 — four graph engines in containers, one dataset, ONE AT A TIME.
+#
+# Every service sits behind a profile, so nothing starts by default:
+#
+#     docker compose --profile neo4j up -d        # one engine
+#     docker compose --profile neo4j down -v      # -v also removes its store
+#     docker compose --profile all up -d          # all four, to query them together
+#
+# Load them one at a time. The four memory limits below add up to more than a
+# Docker VM is usually given, and the stores add up to more than the free disk
+# this module asks for; an engine being measured while another loads produces
+# numbers about the contention. Querying them together afterwards is fine.
+#
+# Each container has the same 8 GB ceiling, but below that ceiling the knobs are
+# not the same knob: a JVM heap, a Neo4j page cache and a graph held entirely in
+# RAM are three different things. Each engine's own configuration sits beside
+# its service.
+#
+# Four services, six engines. Kuzu and Oxigraph have no container: they are
+# libraries that run inside the notebook, which is the whole point of them.
+#
+# Every tag is pinned to the patch, so that the stack you run is the stack the
+# measurements were taken on.
+#
+# The ports avoid 7474 and 7687: those belong to a local Neo4j installation if
+# you have one, and this stack must not touch it.
+
+# The project name is pinned so that moving this file cannot rename the
+# volumes: the loaders refer to `module-03_neo4j-data` and friends by name.
+name: module-03
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # LPG, served, on disk. The reference engine of the course, and the only one
+  # of the six with GDS, which the second half of this module needs for
+  # centrality, communities and pathfinding.
+  #
+  # Community edition: no parallel runtime. The page cache is set above the size
+  # of the store, so that a scan is not reading from disk while an in-memory
+  # engine is being compared with it.
+  # ---------------------------------------------------------------------------
+  neo4j:
+    image: neo4j:2025.11.2-community
+    container_name: kgtp-m3-neo4j
+    profiles: ["neo4j", "all"]
+    ports:
+      - "7476:7474"   # HTTP / Browser
+      - "7690:7687"   # Bolt
+    environment:
+      NEO4J_AUTH: neo4j/kgtp-local
+      NEO4J_PLUGINS: '["graph-data-science","apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: 'apoc.*,gds.*'
+      NEO4J_dbms_security_procedures_allowlist: 'apoc.*,gds.*'
+      NEO4J_server_memory_heap_initial__size: 2G
+      NEO4J_server_memory_heap_max__size: 2G
+      # Above the size of the store, so that a scan is served from memory.
+      NEO4J_server_memory_pagecache_size: 5G
+    volumes:
+      - neo4j-data:/data
+      - ./import:/var/lib/neo4j/import
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "kgtp-local", "RETURN 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  # ---------------------------------------------------------------------------
+  # LPG, served, in memory, over sparse matrices instead of pointer chasing:
+  # the architectural opposite of Neo4j while speaking the same Cypher.
+  #
+  # The tag has NO `v` prefix -- the 6.x line dropped the one the 4.x line used,
+  # and `falkordb/falkordb:v6.0.1` answers `manifest unknown`.
+  #
+  # Three things to know about this engine: there is no Bolt, the Redis protocol
+  # is the only way in; it has no `algo.louvain`; and its indexes are built
+  # asynchronously, so a `CREATE INDEX` that returns has not finished.
+  # ---------------------------------------------------------------------------
+  falkordb:
+    image: falkordb/falkordb:6.0.1
+    container_name: kgtp-m3-falkordb
+    profiles: ["falkordb", "all"]
+    ports:
+      - "6379:6379"   # Redis protocol — the only way in; see the note below
+      - "3100:3000"   # Browser
+    environment:
+      # RESULTSET_SIZE defaults to 10000 and FalkorDB enforces it by silently
+      # truncating the result set: no error, no warning, nothing on the reply.
+      # An answer that is wrong and looks right is the worst failure in this
+      # stack, so the cap is removed rather than left to be discovered.
+      FALKORDB_ARGS: "RESULTSET_SIZE -1"
+    volumes:
+      # /var/lib/falkordb/data and NOT /data: the image ships /data/data as a
+      # symlink to this path, so mounting /data sends the snapshot to the
+      # container's own layer and `docker compose down` takes the data with it.
+      - falkordb-data:/var/lib/falkordb/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  # ---------------------------------------------------------------------------
+  # RDF, served, with inference materialised at load time. This is where the
+  # ontology written by hand in module 2 meets an engine that runs it on the
+  # real data — the reason GraphDB is here is reasoning, not speed.
+  #
+  # Pinned to 10.8.14, which carries an embedded GRAPHDB_LITE license and works
+  # untouched. The 11.x line answers HTTP 500 "No license was set" to every load
+  # and every query, so it would ask you to register with a vendor first.
+  # Inference works in Lite, which is why this engine is in the line-up.
+  # ---------------------------------------------------------------------------
+  graphdb:
+    image: ontotext/graphdb:10.8.14
+    container_name: kgtp-m3-graphdb
+    profiles: ["graphdb", "all"]
+    ports:
+      - "7200:7200"
+    environment:
+      GDB_JAVA_OPTS: >-
+        -Xms2g -Xmx6g
+        -Dgraphdb.home=/opt/graphdb/home
+    volumes:
+      - graphdb-data:/opt/graphdb/home
+      - ./import:/import:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:7200/rest/repositories || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  # ---------------------------------------------------------------------------
+  # RDF, served, the reference implementation of Apache Jena. The only one of
+  # the three with SPARQL federation (`SERVICE`).
+  #
+  # This image is multi-arch and ships Jena 6.2.0; the better known
+  # `stain/jena-fuseki` is linux/amd64 only, and on Apple Silicon a module about
+  # performance would be measuring the emulator.
+  #
+  # The preconfigured `ds` dataset is TDB2 with a Lucene text index and
+  # `tdb:unionDefaultGraph true`. The stored default graph is NOT part of that
+  # union, so the loader writes into a NAMED graph: data loaded into the default
+  # graph answers zero rows to `?s ?p ?o` without any error.
+  # ---------------------------------------------------------------------------
+  fuseki:
+    image: secoresearch/fuseki:6.2.0
+    container_name: kgtp-m3-fuseki
+    profiles: ["fuseki", "all"]
+    ports:
+      - "3030:3030"
+    environment:
+      ADMIN_PASSWORD: kgtp-local
+      QUERY_TIMEOUT: "300000"
+      JAVA_TOOL_OPTIONS: "-Xmx6g"
+      # No ENABLE_DATA_WRITE / ENABLE_UPDATE / ENABLE_SHACL: the entrypoint
+      # implements those with `sed -i` on the assembler, which fails on a
+      # read-only mount. The endpoints are declared in ./fuseki/assembler.ttl.
+    volumes:
+      - fuseki-data:/fuseki-base/databases
+      - ./fuseki/assembler.ttl:/fuseki-base/configuration/assembler.ttl:ro
+      - ./import:/import:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3030/$$/ping || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  # ---------------------------------------------------------------------------
+  # Oxigraph is not here, and that is deliberate.
+  #
+  # It is the embedded engine on the RDF side, mirroring Kuzu on the property
+  # graph side: `pyoxigraph` runs in the notebook process. Served or embedded it
+  # is the same engine writing the same files, so the container would measure a
+  # socket rather than a data structure.
+  # ---------------------------------------------------------------------------
+
+volumes:
+  neo4j-data:
+  falkordb-data:
+  graphdb-data:
+  fuseki-data:

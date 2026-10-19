@@ -8,8 +8,14 @@ dependencies = [
     "rdflib==7.6.0",
     "pyshacl==0.40.1",
     "owlrl==7.6.2",
-    "kuzu==0.11.3",
     "certifi==2025.8.3",
+    "neo4j==5.28.2",
+    "falkordb==1.7.1",
+    "kuzu==0.11.3",
+    "pyoxigraph==0.5.11",
+    "networkx==3.5",
+    "pyarrow==25.0.1",
+    "falkordb-bulk-loader==1.2.0",
 ]
 
 [project.optional-dependencies]
@@ -19,7 +25,6 @@ notebooks = [
     "nbconvert==7.17.1",
 ]
 graphrag = [
-    "neo4j==5.28.2",
     "langgraph==0.6.7",
     "langchain-core==0.3.78",
     "langchain-openai==0.3.35",
