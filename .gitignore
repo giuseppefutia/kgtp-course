@@ -17,3 +17,10 @@ __pycache__/
 modules/03-where-data-lives/import
 /module-03-payload.zip
 /SHA256SUMS.txt
+
+# Module 4's payload, and everything it unpacks into. Same reason as module 3's:
+# larger than git should carry, and rebuilt rather than edited. The dump is 1.4 GB
+# on its own.
+data/
+*.dump
+/module-04-inputs.zip

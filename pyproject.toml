@@ -24,6 +24,26 @@ notebooks = [
     "ipykernel==7.3.0",
     "nbconvert==7.17.1",
 ]
+# Rebuilding module 4's graph from the four CSVs and the extracted corpus. Not
+# needed to run module 4: the module ships the finished graph as a dump, and
+# `tools/04-building-the-graph/README.md` says what this buys you instead.
+build = [
+    # The importers read the CSVs with pandas and hand NaN back as None with
+    # `replace({np.nan: None})`, which is why numpy is named rather than taken
+    # for granted as a pandas dependency.
+    "numpy==2.3.2",
+    # The batch importer's progress bar. A load that prints nothing for two
+    # minutes and a load that has hung look identical.
+    "tqdm==4.67.1",
+    # download.py against the data portal, and corpus/download_pdfs.py against
+    # the document viewer.
+    "requests==2.32.4",
+    # Only the phases that ask a model: the typed extraction over the corpus and
+    # the summariser. Imported inside the functions that use it, so the loaders
+    # that read what a model already wrote run without it installed.
+    "openai==3.14.0",
+]
+
 graphrag = [
     "langgraph==0.6.7",
     "langchain-core==0.3.78",
