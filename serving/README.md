@@ -10,6 +10,7 @@ demonstration, and module 5 uses both.
 |---|---|---|
 | `embeddings.ipynb` | the embedding model, one vector per page | `build.py corpus`, the dense retriever |
 | `llm.ipynb` | the strong model, OpenAI-compatible | the agent scenarios, the batch extraction |
+| `llm-qwen38.ipynb` | the same, serving a dense 27B instead of a 30B with ~3B active | module 5, which needs the served model to check a query it wrote itself |
 
 Both run on a Colab GPU and expose vLLM through a FastAPI proxy over an ngrok
 tunnel: vLLM has no authentication of its own, so it is never exposed directly.

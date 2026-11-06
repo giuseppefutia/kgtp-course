@@ -1,6 +1,7 @@
 # The Python environment from step 3 of the README. It is rebuilt from
 # pyproject.toml, so it never belongs in the repository.
 .venv/
+.venv-student/
 __pycache__/
 *.py[cod]
 *.egg-info/
