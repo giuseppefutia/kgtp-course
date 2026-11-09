@@ -21,7 +21,7 @@ every one.
 | 2 | **Modeling the World** — Schemas, Ontologies & Validation | [`02-modeling-the-world`](modules/02-modeling-the-world) |
 | 3 | **Where Data Lives** — Databases, Queries & Graph Algorithms | [`03-where-data-lives`](modules/03-where-data-lives) |
 | 4 | **Building the Graph** — Ingestion, Extraction & Ontology Design | [`04-building-the-graph`](modules/04-building-the-graph) |
-| 5 | **GraphRAG** — Agents That Navigate Your Knowledge | |
+| 5 | **GraphRAG** — Agents That Navigate Your Knowledge | [`05-graphrag`](modules/05-graphrag) |
 | 6 | **Agentic Memory** — Building Systems That Learn Over Time | |
 | 7 | **Graph Representation Learning** — How Machines Learn from Connections | |
 | 8 | **Production & MLOps** — Keeping It Alive After Launch | |
@@ -35,10 +35,15 @@ Module 1 runs on [Colab](https://colab.research.google.com) only: it trains a
 small graph network with PyTorch, which Colab already has and the environment
 below deliberately leaves out. Every other module runs in that environment.
 
-Modules 3 and 4 also need a database, and not the same one. Module 3 stands up
-six engines in Docker; module 4 runs on **Neo4j Desktop** and arrives as a graph
-dump you load. Each module's README says which, and what it costs in disk and
-download, and it is worth reading the week before rather than the evening of.
+Modules 3, 4 and 5 also need a database, and not the same one. Module 3 stands
+up six engines in Docker; modules 4 and 5 run on **Neo4j Desktop**, and module 5
+asks questions of the same graph module 4 gives you. Each module's README says
+which, and what it costs in disk and download, and it is worth reading the week
+before rather than the evening of.
+
+Module 5 also needs two models being served — one that answers and one that
+embeds — and two more Python packages. Both are in its README; the packages are
+one install line you run in the week of, not now.
 
 ## Setting up
 

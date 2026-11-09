@@ -37,13 +37,23 @@ an error.
 
 ## What you need
 
+**The graph of module 4, in the same Neo4j Desktop DBMS you loaded it into.**
+Nothing is built here and nothing is written: every cell in this module reads.
+
+Two more Python packages than the other modules — LangGraph and the LangChain
+client — so the install line gains one extra:
+
 ```
 pip install -e ".[notebooks,graphrag]"
 ```
 
-A served model and an embedding endpoint, both named in `config.ini` — point it
-at your own or at the one being served for the class. `serving/` has the
-notebooks that serve them.
+And **two models being served**: one that answers, one that embeds. Both are
+named in `config.ini`, with the database beside them — point it at your own or
+at the ones being served for the class, and nothing else in the notebook
+changes. `serving/` holds the notebooks that serve them, one per model.
+
+If the answering model is down the cells that need it fail and say so; the
+figures that do not need it still draw.
 
 The module is one notebook, `lesson.ipynb`. `pipelines/` holds the four systems
 as code you can call and read; `pictures.py` draws every figure in the lesson
