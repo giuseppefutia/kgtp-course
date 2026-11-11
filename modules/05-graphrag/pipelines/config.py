@@ -14,8 +14,11 @@ CONFIG_PATHS = (_MODULE / "config.ini", Path("config.ini"),
                 Path("../config.ini"), Path("../../config.ini"))
 
 DEFAULTS = {
-    "neo4j": {"uri": "bolt://localhost:7687", "user": "neo4j", "password": "kgtp-local",
-              "database": "neo4j"},
+    # The same four the rest of the course falls back to, named in module 4's
+    # README. They were `kgtp-local` and `neo4j` here, which meant this file
+    # disagreed with the notebook beside it whenever `config.ini` was missing.
+    "neo4j": {"uri": "bolt://localhost:7687", "user": "neo4j", "password": "password",
+              "database": "kgtp"},
     "llm": {"base_url": "http://localhost:8000/v1", "api_key": "EMPTY",
             "model": "Qwen/Qwen3-4B-Instruct"},
     "embeddings": {"base_url": "https://kgtp-embed.ngrok-free.app/v1",
@@ -45,6 +48,15 @@ def setting(section: str, key: str) -> str:
     env = os.environ.get(f"KGTP_{section.upper()}_{key.upper()}")
     if env:
         return env
+    # `NEO4J_PASSWORD` as well as `KGTP_NEO4J_PASSWORD`, because module 4's
+    # README promises the four bare names to the whole course and a student who
+    # exports them would otherwise find everything working except the one
+    # pipeline that opens its own connection -- `text2cypher`, inside
+    # `validate`, where the failure reads as the query being wrong.
+    if section == "neo4j":
+        env = os.environ.get(f"NEO4J_{key.upper()}")
+        if env:
+            return env
     if _parser.has_option(section, key):
         return _parser.get(section, key)
     return DEFAULTS[section][key]

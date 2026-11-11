@@ -40,6 +40,11 @@ an error.
 **The graph of module 4, in the same Neo4j Desktop DBMS you loaded it into.**
 Nothing is built here and nothing is written: every cell in this module reads.
 
+As in module 4, `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` and
+`NEO4J_DATABASE` are read from the environment and fall back to
+`bolt://localhost:7687`, `neo4j`, `password` and `kgtp`. Export them rather than
+editing `config.ini`, which is under version control.
+
 Two more Python packages than the other modules — LangGraph and the LangChain
 client — so the install line gains one extra:
 
