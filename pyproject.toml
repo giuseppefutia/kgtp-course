@@ -60,6 +60,24 @@ graphrag = [
     "openai==2.54.0",
 ]
 
+# Module 6's memory layer. The three memory types the module builds -- the
+# conversation, the entities a turn touched, the trace of its tool calls -- are
+# this library's three layers, so the module records them with it rather than
+# rewriting a store. Four dependencies, and three of them are already here.
+#
+# Pinned to 0.8.0 for the reason every pin here exists, with one extra reason:
+# the library is pre-1.0 with fifteen releases behind it, and its own FAQ
+# documents a breaking change before 0.2.1. Every claim module 6 makes about it
+# is a claim about this version.
+#
+# Measured 11/11/2026: installed into the pinned stack above it leaves
+# `neo4j` at 5.28.2. Installed on its own into an empty environment it resolves
+# `neo4j` to 6.4.1, because it declares `>=5.20,<7` -- so it goes in with the
+# rest, never alone.
+agent-memory = [
+    "neo4j-agent-memory==0.8.0",
+]
+
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"

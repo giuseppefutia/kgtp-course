@@ -321,7 +321,8 @@ def resolve_id(raw: str, issued: set[str] | None) -> str | None:
 
 
 def run_tool(session, name: str, args: dict, chooser=None, question: str = "",
-             issued: set[str] | None = None) -> str:
+             issued: set[str] | None = None,
+             extra: dict[str, Any] | None = None) -> str:
 
     try:
         if name == "search_descriptions":
@@ -409,6 +410,15 @@ def run_tool(session, name: str, args: dict, chooser=None, question: str = "",
         # times on 15/9/2026. A tool that raises ends the conversation; a tool
         # that reports lets the agent do something else.
         return f"the tool failed: {type(error).__name__}. Try another tool or query."
+    # A handler the caller brought with it, consulted only after this module's
+    # own eight. Module 6 adds a ninth tool this way: without it the model is
+    # shown a tool whose name reaches the line below, and "no such tool" reads
+    # to the agent as a tool that is broken rather than one that is absent.
+    if extra and name in extra:
+        try:
+            return extra[name](args)
+        except Exception as error:      # noqa: BLE001 - same contract as above
+            return f"the tool failed: {type(error).__name__}. Try another tool or query."
     return f"no such tool: {name}"
 
 
@@ -448,6 +458,7 @@ class ReactState(TypedDict, total=False):
     answer: str
     trace: Annotated[list[dict], add]
     sent: Annotated[int, add]
+    extra_tools: dict[str, Any]   # name -> handler, for tools this module does not own
 
 
 def call_model(state: ReactState) -> ReactState:
@@ -519,7 +530,8 @@ def run_tools(state: ReactState) -> ReactState:
                 print(f"\n  step {step}: answer\n   " + text.replace("\n", "\n   "))
             return {"messages": messages, "trace": entries, "answer": text}
         result = run_tool(state["session"], name, args, state["chooser"],
-                          state["question"], state["issued"])
+                          state["question"], state["issued"],
+                          state.get("extra_tools"))
         entries.append({"step": step, "tool": name, "args": args, "result": result})
         if echo:
             print(f"\n  step {step}: {name}({json.dumps(args)[:110]})")
@@ -575,11 +587,23 @@ def build():
 
 
 def agent(session, question: str, steps: int = 12, chooser=None,
-             echo: bool = True, schema: bool = False) -> dict:
+             echo: bool = True, schema: bool = False,
+             tools: list[dict] | None = None, system: str | None = None,
+             extra_tools: dict[str, Any] | None = None) -> dict:
     """Run the agent; return what was called and what was answered.
 
     Returned as well as printed so `benchmark.cases` can check which tools were
     used and in what order, not only the final prose.
+
+    `tools` and `system` default to all eight tools and the prose below, which
+    is this module's agent and the only thing this module runs. They are
+    parameters because module 6 asks one question twice with one tool's
+    difference between the runs: a second entry point that assembled the same
+    state would be a copy of this one, and the two would drift.
+
+    Passing one without the other is allowed and is usually a mistake: the
+    prose names six of the tools, so a shorter list with this prose still
+    orders the model to call what it does not have.
     """
     from openai import OpenAI
 
@@ -592,9 +616,12 @@ def agent(session, question: str, steps: int = 12, chooser=None,
     api = OpenAI(base_url=LLM_URL, api_key=LLM_KEY, timeout=180.0, max_retries=8)
     final = build().invoke(
         {"question": question, "session": session, "api": api,
-         "tools": tools_for(session), "chooser": chooser, "echo": echo,
+         "tools": tools_for(session) if tools is None else tools,
+         "chooser": chooser, "echo": echo,
          "steps": steps, "step": 0, "nudged": False, "issued": set(),
-         "messages": [{"role": "system", "content": SYSTEM + (
+         "extra_tools": extra_tools or {},
+         "messages": [{"role": "system", "content": (SYSTEM if system is None
+                                                     else system) + (
              # The whole measured schema appended to the instructions, to answer
              # one question and no other: does the agent choose better when it
              # can see the shape of the graph? It cannot write Cypher -- the
