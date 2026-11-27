@@ -23,7 +23,7 @@ every one.
 | 4 | **Building the Graph** — Ingestion, Extraction & Ontology Design | [`04-building-the-graph`](modules/04-building-the-graph) |
 | 5 | **GraphRAG** — Agents That Navigate Your Knowledge | [`05-graphrag`](modules/05-graphrag) |
 | 6 | **Agentic Memory** — Building Systems That Learn Over Time | [`06-agentic-memory`](modules/06-agentic-memory) |
-| 7 | **Graph Representation Learning** — How Machines Learn from Connections | |
+| 7 | **Graph Representation Learning** — How Machines Learn from Connections | [`07-graph-representation-learning`](modules/07-graph-representation-learning) |
 | 8 | **Production & MLOps** — Keeping It Alive After Launch | |
 | 9 | **Building the KG Culture** — From Proof of Concept to Strategic Asset | |
 
@@ -32,8 +32,10 @@ them a `lab.ipynb` you do afterwards. A folder name is the title above with the
 subtitle dropped, so you can find a module without translating.
 
 Module 1 runs on [Colab](https://colab.research.google.com) only: it trains a
-small graph network with PyTorch, which Colab already has and the environment
-below deliberately leaves out. Every other module runs in that environment.
+small graph network with PyTorch, which Colab already has and the base install
+below leaves out. Every other module runs in that environment — module 7 adds
+PyTorch to it as an extra, in the week it is taught, because it is 560 MB and
+nobody should carry it for nine weeks to use it in one.
 
 Modules 3, 4 and 5 also need a database, and not the same one. Module 3 stands
 up six engines in Docker; modules 4 and 5 run on **Neo4j Desktop**, and module 5
@@ -48,6 +50,14 @@ one install line you run in the week of, not now.
 Module 6 needs the same two models, one package more, and a **second database**
 in the same Neo4j server, for a memory that is a graph of its own. Its README
 says how to create it, and why nothing joins it to the graph of module 4.
+
+Module 7 reads the graph of module 4 and writes nothing to it. It needs one
+package group more — the one carrying PyTorch — and one model served, for its
+last cell only. The trained network it reasons about ships with the module, so
+the lesson loads it instead of spending five of its ninety minutes on four
+hundred epochs; [`tools/07-graph-representation-learning`](tools/07-graph-representation-learning)
+is how you rebuild it, and the only place in the course where you can change one
+thing and run it again.
 
 ## Setting up
 

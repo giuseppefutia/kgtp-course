@@ -1,0 +1,16 @@
+{
+ "task": "a new licence on anything the owner holds, 2018-2021",
+ "observed_to": 2015,
+ "split": "by connected component of co-ownership",
+ "columns": 52,
+ "hidden": 256,
+ "layers": 3,
+ "dropout": 0.2,
+ "epochs": 400,
+ "seed": 0,
+ "metric": "roc_auc",
+ "valid": 0.7161,
+ "test": 0.708,
+ "test_rows": 20946,
+ "trained": "2026-11-27"
+}

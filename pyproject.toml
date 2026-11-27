@@ -78,6 +78,52 @@ agent-memory = [
     "neo4j-agent-memory==0.8.0",
 ]
 
+# Module 7's graph networks. Six packages, and the reason the module has an
+# extra of its own rather than joining the base is what they weigh. Measured
+# 27/11/2026 on this file: `notebooks,graphrag` is 739 MB of site-packages and
+# `notebooks,graphrag,gnn` is 1.3 GB, so the extra costs about 560 MB -- 328 of
+# them torch alone. A student who runs module 7 needs it; one who stops at
+# module 6 never installs it.
+#
+# Installed together with the extras above it, measured the same day, nothing
+# below moves: pandas stays at 3.0.6, neo4j at 5.28.2, networkx at 3.5, numpy at
+# 2.3.2 and openai at 2.54.0 -- so modules 2, 4, 5 and 6 are untouched, and the
+# karate club numbers of section 1 come out as the module reports them.
+#
+# torch is 2.5.1 rather than the newest because that is the version every number
+# in the module was measured with. A module that cites a number has to be able to
+# reproduce it, and torch moves its defaults between minor releases.
+#
+# scikit-learn carries the AUC and the three table models the network is compared
+# against, so it is pinned for the same reason as torch: that comparison is the
+# content of the module, and a classifier whose defaults moved makes it a
+# different comparison.
+#
+# scipy and numpy are named rather than taken for granted as dependencies of
+# something else. `tools/07-graph-representation-learning/` imports both directly -- it
+# is code a student runs, so it declares what it imports -- and numpy is in the
+# `build` extra for the same reason.
+#
+# matplotlib draws the karate club of section 1, and nothing else: every other
+# figure in the module is an inline SVG built by `pictures.py`.
+#
+# NOT here: `captum`. It was in this list while the module was going to end in an
+# explanation lab; the lab was cut, and nothing in the module imports it --
+# checked 27/11/2026, zero occurrences. A dependency nobody imports is a claim
+# about the module that stops being true without anything failing.
+#
+# NOT here: `graphdatascience`. The GDS projection route needs the node features
+# stored as properties, and this module computes them in the query -- so it buys
+# a `SET` pass and nothing else.
+gnn = [
+    "torch==2.5.1",
+    "torch_geometric==2.8.0.post1",
+    "scikit-learn==1.8.0",
+    "scipy==1.16.3",
+    "numpy==2.3.2",
+    "matplotlib==3.10.8",
+]
+
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
