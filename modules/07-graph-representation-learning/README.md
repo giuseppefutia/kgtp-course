@@ -35,7 +35,7 @@ cut — the answer.
    gradient boosting, an MLP of *equal capacity*, and the network. The MLP is
    the control the section turns on: same layers, same parameters, empty
    `edge_index`.
-5. **Which direction the edges go.** Written both ways the network scores 0.729.
+5. **Which direction the edges go.** Written both ways the network scores 0.728.
    Written `owner -> business` only it scores 0.696 — which is, to four decimal
    places, exactly what the same network scores with no edges at all.
 6. **The same question, split another way.** Co-owners kept together instead of
