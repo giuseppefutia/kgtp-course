@@ -104,8 +104,19 @@ agent-memory = [
 # is code a student runs, so it declares what it imports -- and numpy is in the
 # `build` extra for the same reason.
 #
-# matplotlib draws the karate club of section 1, and nothing else: every other
-# figure in the module is an inline SVG built by `pictures.py`.
+# matplotlib draws the karate club of section 1, and the two `extra-` notebooks
+# beside the lesson; every other figure in the module is an inline SVG built by
+# `pictures.py`.
+#
+# scikit-image is read and greyscale for `extra-shift-equivariance.ipynb`, which
+# convolves a photograph to show the property a convolution has and a graph
+# network has to be given. Two functions, `io.imread` and `color.rgb2gray`.
+#
+# NOT here: `torch_scatter`. The permutation notebook arrived importing it, and
+# `torch_geometric.utils.scatter` is the same function with the same
+# `reduce='add'` -- without a compiled extension that has to be built against
+# the exact torch wheel, which is the install that fails on a laptop the evening
+# before.
 #
 # NOT here: `captum`. It was in this list while the module was going to end in an
 # explanation lab; the lab was cut, and nothing in the module imports it --
@@ -122,6 +133,7 @@ gnn = [
     "scipy==1.16.3",
     "numpy==2.3.2",
     "matplotlib==3.10.8",
+    "scikit-image==0.25.2",
 ]
 
 [build-system]

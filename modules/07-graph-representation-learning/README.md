@@ -44,6 +44,30 @@ cut — the answer.
    scoring one owner from her own three-hop neighbourhood, handed to module 5's
    agent as a ninth tool.
 
+## Two notebooks beside the lesson
+
+Neither is part of the live session; both run on the `gnn` group alone, with no
+Neo4j, no model and no Chicago. They are the property the lesson assumes and
+never proves.
+
+**`extra-permutation-equivariance.ipynb`** builds a message-passing layer from
+`MessagePassing` and unit-tests two claims on a QM9 molecule: that permuting the
+nodes permutes a *layer's* output the same way, and leaves a whole *model's*
+output unchanged. Both come back `True`. It downloads QM9 the first time —
+**684 MB and about a hundred seconds** — to use one molecule, which is said at
+the top of the file.
+
+**`extra-shift-equivariance.ipynb`** does the same for the property a
+convolution gets for free. Convolve then shift, or shift then convolve: the same
+picture in the middle (`True`), a different one in the corner (`False`, because
+the shift wraps). The photograph is `minuzzo.jpg`, next to the notebook.
+`convolve` is a literal double loop over twelve million regions and takes **22
+seconds and 3 GB** each of the two times it is called.
+
+Together they are the answer to *why `aggr='add'`*: a grid gives a convolution
+its equivariance, a graph has no grid, so on a graph the property has to be put
+into the layer by hand.
+
 ## What you will see fail
 
 **The headline number loses most of itself to one line of code.** Over four
